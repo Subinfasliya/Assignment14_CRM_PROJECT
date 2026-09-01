@@ -1,21 +1,4 @@
-// import { useAuth } from "../context/AuthContext"
 
-// const Dashboard = () =>{
-
-//     const {user} = useAuth()
-
-//     return (
-//         <>
-//         <h2 className="text-2xl text-center font-bold">Dashboard </h2>
-
-//         <p>Welcome {user?.name}</p>
-
-//         <p>Role: {user?.role}</p>
-//         </>
-//     )
-// }
-
-// export default Dashboard
 
 
 import { useEffect, useState } from "react";
@@ -32,7 +15,7 @@ import {
 import CustomerModal from "../components/crm/CustomerModal";
 import Pagination from "../components/crm/Pagination";
 import DeleteConfirmModal from "../components/crm/DeleteConfirmModal";
-import CustomerTable from "../components/crm/customerTable";
+import CustomerTable from "../components/crm/CustomerTable";
 
 
 
