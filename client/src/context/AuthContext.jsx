@@ -1,13 +1,29 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import authApi from "../api/authApi";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem("user");
+  const [user, setUser] = useState(null)
+  const [loading,setLoading] = useState(true)
 
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
+  const getCurrentUser = async() =>{
+    try{
+     const resposne = await authApi.get("/me")
+     console.log(resposne.data.user);
+     
+    } catch(error){
+      setUser(null)
+    } finally{
+      setLoading(false)
+    }
+  }
+
+
+  useEffect(()=> {
+    getCurrentUser()
+  }, [])
+
 
   const [token, setToken] = useState(() => {
     return localStorage.getItem("token");

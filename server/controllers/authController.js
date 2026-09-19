@@ -1,6 +1,17 @@
 const User = require("../models/userModel");
-const { generateToken } = require("../utils/jwt");
 const { hashedPassword, comparePassword } = require("../utils/password");
+const { sendTokenResponse } = require("../utils/sendToken");
+
+const getMe = async (req, res, next) => {
+  try {
+    res.status(200).json({
+      success: true,
+      user: req.user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 const register = async (req, res, next) => {
   try {
@@ -60,25 +71,28 @@ const login = async (req, res, next) => {
       });
     }
 
-    const token = generateToken({ id: user._id, role: user.role });
+    // Set cookie and send response
+    sendTokenResponse(user, 200, res);
+  } catch (error) {
+    next(error);
+  }
+};
 
-
+const logout = (req, res, next) => {
+  try {
+    res.cookie("token", "none", {
+      expires: new Date(0),
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    });
 
     res.status(200).json({
       success: true,
-      message: "Login Successful",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-      },
+      message: "User logged out successfully",
     });
   } catch (error) {
     next(error);
   }
 };
 
-module.exports = { register, login };
+module.exports = { register, login, getMe, logout };

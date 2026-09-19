@@ -1,13 +1,12 @@
-const { dashboardController, createUser, getAllUsers, updateUser, deleteUser } = require("../../controllers/userController");
+const {  createUser, getAllUsers, updateUser, deleteUser } = require("../../controllers/userController");
+const protect  = require("../../middlewares/authMiddleware");
 
-const authenticate = require("../../middlewares/authenticate");
+
 const authorizeAdmin = require("../../middlewares/authorizeAdmin");
 
 const userRouter = require("express").Router();
 
-userRouter.use(authenticate, authorizeAdmin)
-
-// userRouter.get("/dashboard", authenticate, authorizeAdmin, dashboardController);
+userRouter.use(protect, authorizeAdmin)
 
 userRouter.get("/", getAllUsers)
 userRouter.post("/", createUser)
