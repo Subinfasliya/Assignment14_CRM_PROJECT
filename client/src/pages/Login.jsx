@@ -10,8 +10,8 @@ const Login = () => {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-
-  const { login } = useAuth();
+ 
+  const { login, loading } = useAuth();
 
   const navigate = useNavigate();
 
@@ -27,12 +27,14 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-
     try {
-      const response = await loginUser(formData);
+      const response = await login(formData);
+
+      console.log(response);
+      
 
       if (response.success) {
-        login(response)
+        
         toast.success(response.message);
 
         navigate("/dashboard");
@@ -150,9 +152,10 @@ const Login = () => {
           {/* Submit */}
           <button
             type="submit"
+            disabled={loading}
             className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700 active:scale-[0.98]"
           >
-            Login
+           {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 

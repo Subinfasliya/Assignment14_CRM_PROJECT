@@ -11,3 +11,13 @@ export const loginUser = async (formData) => {
 
   return response.data;
 };
+
+export const logoutUser = async () => {
+  const response = await authApi.post("/logout");
+  return response.data;
+};
+
+export const refreshUser = async () => {
+  const response = await authApi.post("/refresh");
+  return response.data;
+};

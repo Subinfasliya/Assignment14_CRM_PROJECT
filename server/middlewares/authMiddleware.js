@@ -1,4 +1,4 @@
-const { verifyToken } = require("../utils/jwt");
+const { verifyToken } = require("../utils/token");
 
  const protect = async (req, res, next) => {
   try {

@@ -1,24 +1,26 @@
-import userApi from "../api/userApi";
+// import userApi from "../api/userApi";
+
+import api from "../api/axiosInstance";
 
 export const getUsers = async (page = 1, limit = 10) => {
-  const response = await userApi.get(`?page=${page}&limit=${limit}`);
+  const response = await api.get(`users/users?page=${page}&limit=${limit}`);
 
   return response.data;
 };
 
 export const createUser = async (userData) => {
-  const response = await userApi.post("/", userData);
+  const response = await api.post("/users", userData);
 
   return response.data;
 };
 
 export const updateUser = async (id, userData) => {
-  const response = await userApi.put(`/${id}`, userData);
+  const response = await api.put(`/users/${id}`, userData);
 
   return response.data;
 };
 
 export const deleteUser = async (id) => {
-  const response = await userApi.delete(`/${id}`);
+  const response = await api.delete(`/${id}`);
   return response.data;
 };

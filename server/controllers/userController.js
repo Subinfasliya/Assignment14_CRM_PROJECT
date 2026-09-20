@@ -1,5 +1,5 @@
 const User = require("../models/userModel");
-const { generateToken } = require("../utils/jwt");
+const { generateToken } = require("../utils/token");
 const { hashedPassword } = require("../utils/password");
 
 // const dashboardController = (req, res, next) => {
