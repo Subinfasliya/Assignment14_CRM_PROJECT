@@ -2,7 +2,9 @@
 
 
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 
 import {
   getUsers,
@@ -23,6 +25,8 @@ import CustomerTable from "../components/crm/CustomerTable";
 
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
   const [users, setUsers] = useState([]);
 
   const [pagination, setPagination] =
@@ -85,9 +89,8 @@ const Dashboard = () => {
     fetchUsers(1);
   }, []);
 
-  // =========================
+
   // OPEN ADD MODAL
-  // =========================
 
   const handleAddCustomer = () => {
     setEditingUser(null);
@@ -95,19 +98,17 @@ const Dashboard = () => {
     setIsCustomerModalOpen(true);
   };
 
-  // =========================
+  
   // OPEN EDIT MODAL
-  // =========================
-
+  
   const handleEditCustomer = (user) => {
     setEditingUser(user);
 
     setIsCustomerModalOpen(true);
   };
 
-  // =========================
+  
   // ADD / UPDATE
-  // =========================
 
   const handleCustomerSubmit = async (
     formData
@@ -148,20 +149,18 @@ const Dashboard = () => {
     }
   };
 
-  // =========================
+ 
   // OPEN DELETE MODAL
-  // =========================
-
+ 
   const handleDeleteClick = (user) => {
     setSelectedUser(user);
 
     setIsDeleteModalOpen(true);
   };
 
-  // =========================
+ 
   // DELETE
-  // =========================
-
+ 
   const handleDeleteConfirm = async () => {
     if (!selectedUser) return;
 
@@ -202,12 +201,24 @@ const Dashboard = () => {
     }
   };
 
-  // =========================
+ 
   // PAGINATION
-  // =========================
-
+ 
   const handlePageChange = (page) => {
     fetchUsers(page);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Logout failed. You have been signed out locally."
+      );
+    } finally {
+      navigate("/login", { replace: true });
+    }
   };
 
   return (
@@ -226,12 +237,22 @@ const Dashboard = () => {
           </p>
         </div>
 
-        <button
-          onClick={handleAddCustomer}
-          className="rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
-        >
-          + Add Customer
-        </button>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <button
+            onClick={handleAddCustomer}
+            className="rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
+          >
+            + Add Customer
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="rounded-lg bg-red-600 px-5 py-3 font-semibold text-white hover:bg-red-700"
+          >
+            Logout
+          </button>
+        </div>
+   
 
       </div>
 

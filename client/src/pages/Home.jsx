@@ -1,13 +1,3 @@
-// const Home = () => {
-//   return (
-//     <>
-//       <h2>Home Page is this</h2>
-//     </>
-//   );
-// };
-
-// export default Home;
-
 
 import { Link } from "react-router";
 

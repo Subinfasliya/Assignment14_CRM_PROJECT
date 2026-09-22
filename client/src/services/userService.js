@@ -1,9 +1,8 @@
-// import userApi from "../api/userApi";
 
 import api from "../api/axiosInstance";
 
 export const getUsers = async (page = 1, limit = 10) => {
-  const response = await api.get(`users/users?page=${page}&limit=${limit}`);
+  const response = await api.get(`/users?page=${page}&limit=${limit}`);
 
   return response.data;
 };

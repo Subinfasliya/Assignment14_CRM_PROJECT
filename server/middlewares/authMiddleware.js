@@ -1,24 +1,42 @@
-const { verifyToken } = require("../utils/token");
+const User = require("../models/userModel");
+const { verifyAccessToken } = require("../utils/token");
 
- const protect = async (req, res, next) => {
+
+const protect = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
+    const authHeader = req.headers.authorization;
 
-    if (!token) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res
         .status(401)
         .json({ success: false, message: "Not authorized, no token" });
     }
 
-    const decoded = verifyToken(token);
+    // Extract token
 
-    req.user = await User.findById(decoded.id).select("-password");
+    const token = authHeader.split(" ")[1];
 
-    if (!req.user) {
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authorized, no token",
+      });
+    }
+
+    // Verify access token
+
+    const decoded = verifyAccessToken(token);
+
+    const user = await User.findById(decoded.id).select("-password");
+
+    if (!user) {
       return res
         .status(401)
         .json({ success: false, message: "User not found" });
     }
+
+    // Attach user to request
+    req.user = user;
 
     next();
   } catch (error) {
@@ -29,4 +47,4 @@ const { verifyToken } = require("../utils/token");
   }
 };
 
-module.exports = protect
+module.exports = protect;
