@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import Button from "../ui/Button";
+import Input from "../ui/Input";
 
 const initialFormData = {
   name: "",
@@ -91,13 +93,13 @@ const CustomerModal = ({
               Name
             </label>
 
-            <input
+            <Input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 outline-none focus:border-blue-500"
+              size="compact"
               placeholder="Enter name"
             />
           </div>
@@ -108,13 +110,13 @@ const CustomerModal = ({
               Email
             </label>
 
-            <input
+            <Input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 outline-none focus:border-blue-500"
+              size="compact"
               placeholder="Enter email"
             />
           </div>
@@ -125,13 +127,13 @@ const CustomerModal = ({
               Phone
             </label>
 
-            <input
+            <Input
               type="tel"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
               required
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 outline-none focus:border-blue-500"
+              size="compact"
               placeholder="Enter phone number"
             />
           </div>
@@ -143,14 +145,14 @@ const CustomerModal = ({
                 Password
               </label>
 
-              <input
+              <Input
                 type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
                 required
-                minLength={6}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2.5 outline-none focus:border-blue-500"
+                minLength={8}
+                size="compact"
                 placeholder="Enter password"
               />
             </div>
@@ -180,26 +182,24 @@ const CustomerModal = ({
 
           {/* Buttons */}
           <div className="flex justify-end gap-3 pt-4">
-            <button
-              type="button"
+            <Button
+              variant="secondary"
               onClick={onClose}
               disabled={loading}
-              className="rounded-lg border border-gray-300 px-4 py-2.5 font-medium hover:bg-gray-100"
             >
               Cancel
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
             >
               {loading
                 ? "Saving..."
                 : editingUser
                 ? "Update Customer"
                 : "Add Customer"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

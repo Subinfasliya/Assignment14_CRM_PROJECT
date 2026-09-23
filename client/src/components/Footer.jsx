@@ -7,16 +7,6 @@ const Footer = () => {
           © {new Date().getFullYear()} User Management. All rights reserved.
         </p>
 
-        {/* Footer Links */}
-        <div className="flex gap-6 text-sm font-medium">
-          <a href="/terms" className="hover:text-blue-500 hover:underline">
-            Terms & Conditions
-          </a>
-
-          <a href="/privacy" className="hover:text-blue-500 hover:underline">
-            Privacy Policy
-          </a>
-        </div>
       </div>
     </footer>
   );

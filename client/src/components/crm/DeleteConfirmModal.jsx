@@ -1,3 +1,5 @@
+import Button from "../ui/Button";
+
 const DeleteConfirmModal = ({
   isOpen,
   customer,
@@ -30,23 +32,23 @@ const DeleteConfirmModal = ({
         </p>
 
         <div className="mt-6 flex justify-end gap-3">
-          <button
+          <Button
+            variant="secondary"
             onClick={onClose}
             disabled={loading}
-            className="rounded-lg border border-gray-300 px-4 py-2.5 font-medium hover:bg-gray-100"
           >
             Cancel
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="danger"
             onClick={onConfirm}
             disabled={loading}
-            className="rounded-lg bg-red-600 px-4 py-2.5 font-semibold text-white hover:bg-red-700 disabled:opacity-50"
           >
             {loading
               ? "Deleting..."
               : "Delete"}
-          </button>
+          </Button>
         </div>
 
       </div>

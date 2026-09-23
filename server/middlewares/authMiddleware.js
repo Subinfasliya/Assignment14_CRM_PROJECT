@@ -1,7 +1,6 @@
 const User = require("../models/userModel");
 const { verifyAccessToken } = require("../utils/token");
 
-
 const protect = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -42,7 +41,7 @@ const protect = async (req, res, next) => {
   } catch (error) {
     return res.status(401).json({
       success: false,
-      message: "Invalid or expired token",
+      message: "Invalid or expired access token",
     });
   }
 };

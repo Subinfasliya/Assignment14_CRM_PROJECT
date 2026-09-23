@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { registerUser } from "../services/authService";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
+import AuthPageShell from "../components/auth/AuthPageShell";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -16,9 +19,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // =========================
   // HANDLE INPUT CHANGE
-  // =========================
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,9 +30,7 @@ const Register = () => {
     }));
   };
 
-  // =========================
   // HANDLE SUBMIT
-  // =========================
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,9 +40,7 @@ const Register = () => {
     const phone = formData.phone.trim();
     const password = formData.password;
 
-    // =========================
     // FRONTEND VALIDATION
-    // =========================
 
     if (name.length < 2) {
       toast.error("Name must contain at least 2 characters");
@@ -69,16 +66,12 @@ const Register = () => {
       return;
     }
 
-    if (password.length < 6) {
-      toast.error("Password must contain at least 6 characters");
+    if (password.length < 8) {
+      toast.error("Password must contain at least 8 characters");
       return;
     }
 
-  
-
-    // =========================
     // API REQUEST
-    // =========================
 
     try {
       setLoading(true);
@@ -107,34 +100,33 @@ const Register = () => {
     } catch (error) {
       console.error(error);
 
-      toast.error(error.response?.data?.message || "Registration failed");
+      const responseData = error.response?.data;
+      const validationMessage = responseData?.errors?.[0]?.message;
+
+      toast.error(
+        validationMessage || responseData?.message || "Registration failed",
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[calc(100vh-160px)] bg-gray-50 px-4 py-10">
-      <div className="mx-auto flex min-h-[calc(100vh-240px)] max-w-md items-center">
-        <div className="w-full rounded-xl bg-white p-6 shadow-md sm:p-8">
-          {/* =========================
-              HEADING
-          ========================== */}
-
-          <div className="mb-6 text-center">
-            <h1 className="text-2xl font-bold text-gray-800 sm:text-3xl">
-              Create Account
-            </h1>
-
-            <p className="mt-2 text-sm text-gray-500">
-              Register your account to get started
-            </p>
-          </div>
-
-          {/* =========================
-              REGISTER FORM
-          ========================== */}
-
+    <AuthPageShell
+      title="Create Account"
+      subtitle="Register your account to get started"
+      footer={
+        <p className="mt-6 text-center text-sm text-gray-600">
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            className="font-semibold text-blue-600 hover:underline"
+          >
+            Login
+          </Link>
+        </p>
+      }
+    >
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Name */}
             <div>
@@ -145,7 +137,7 @@ const Register = () => {
                 Full Name
               </label>
 
-              <input
+              <Input
                 id="name"
                 type="text"
                 name="name"
@@ -155,7 +147,6 @@ const Register = () => {
                 autoComplete="name"
                 required
                 disabled={loading}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100"
               />
             </div>
 
@@ -168,7 +159,7 @@ const Register = () => {
                 Email Address
               </label>
 
-              <input
+              <Input
                 id="email"
                 type="email"
                 name="email"
@@ -178,7 +169,6 @@ const Register = () => {
                 autoComplete="email"
                 required
                 disabled={loading}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100"
               />
             </div>
 
@@ -191,7 +181,7 @@ const Register = () => {
                 Phone Number
               </label>
 
-              <input
+              <Input
                 id="phone"
                 type="tel"
                 name="phone"
@@ -203,7 +193,6 @@ const Register = () => {
                 maxLength={10}
                 required
                 disabled={loading}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100"
               />
             </div>
 
@@ -217,7 +206,7 @@ const Register = () => {
               </label>
 
               <div className="relative">
-                <input
+                <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   name="password"
@@ -227,7 +216,7 @@ const Register = () => {
                   autoComplete="new-password"
                   required
                   disabled={loading}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 pr-12 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100"
+                  className="pr-12"
                 />
 
                 <button
@@ -268,31 +257,17 @@ const Register = () => {
             </div>
 
             {/* Submit */}
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+              size="lg"
+              className="w-full active:scale-[0.98]"
             >
               {loading ? "Creating Account..." : "Create Account"}
-            </button>
+            </Button>
           </form>
 
-          {/* =========================
-              LOGIN LINK
-          ========================== */}
-
-          <p className="mt-6 text-center text-sm text-gray-600">
-            Already have an account?{" "}
-            <Link
-              to="/login"
-              className="font-semibold text-blue-600 hover:underline"
-            >
-              Login
-            </Link>
-          </p>
-        </div>
-      </div>
-    </div>
+    </AuthPageShell>
   );
 };
 

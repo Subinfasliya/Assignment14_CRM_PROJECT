@@ -20,6 +20,6 @@ export const updateUser = async (id, userData) => {
 };
 
 export const deleteUser = async (id) => {
-  const response = await api.delete(`/${id}`);
+  const response = await api.delete(`/users/${id}`);
   return response.data;
 };

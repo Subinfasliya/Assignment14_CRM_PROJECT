@@ -1,19 +1,23 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { loginUser } from "../services/authService";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
+import AuthPageShell from "../components/auth/AuthPageShell";
 
 const Login = () => {
+  const navigate = useNavigate();
+
+  const { login, loading } = useAuth();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-  const [showPassword, setShowPassword] = useState(false);
- 
-  const { login, loading } = useAuth();
 
-  const navigate = useNavigate();
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,39 +32,45 @@ const Login = () => {
     e.preventDefault();
 
     try {
+      
       const response = await login(formData);
 
-      console.log(response);
-      
+      // Redirect according to role
 
-      if (response.success) {
-        
+      if (response.user.role === "admin") {
+        navigate("/admin", {
+          replace: true,
+        });
+      } else {
+        navigate("/app", {
+          replace: true,
+        });
+      }
+
+      // if (response.success) {
         toast.success(response.message);
 
-        navigate("/dashboard");
-      }
+      //   navigate("/dashboard");
+      // }
     } catch (error) {
       console.log(error);
-      const message = error.response?.data?.message || "Login failed"
+      const message = error.response?.data?.message || "Login failed";
       toast.error(message);
     }
   };
 
-
-
   return (
-    <div className="min-h-[calc(100vh-160px)] flex items-center justify-center px-4 py-10 bg-gray-50">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-md p-6 sm:p-8">
-        {/* Heading */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
-            Welcome Back
-          </h1>
-
-          <p className="mt-2 text-sm text-gray-500">Login to your account</p>
-        </div>
-
-        {/* Login Form */}
+    <AuthPageShell title="Welcome Back" subtitle="Login to your account" footer={
+      <p className="mt-6 text-center text-sm text-gray-600">
+        Don't have an account?{" "}
+        <Link
+          to="/register"
+          className="font-semibold text-blue-600 hover:underline"
+        >
+          Register
+        </Link>
+      </p>
+    }>
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Email */}
           <div>
@@ -71,7 +81,7 @@ const Login = () => {
               Email
             </label>
 
-            <input
+            <Input
               id="email"
               type="email"
               name="email"
@@ -80,7 +90,6 @@ const Login = () => {
               placeholder="Enter your email"
               autoComplete="email"
               required
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
 
@@ -94,7 +103,7 @@ const Login = () => {
             </label>
 
             <div className="relative">
-              <input
+              <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
                 name="password"
@@ -103,7 +112,7 @@ const Login = () => {
                 placeholder="Enter your password"
                 autoComplete="current-password"
                 required
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 pr-12 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="pr-12"
               />
 
               <button
@@ -139,38 +148,18 @@ const Login = () => {
             </div>
           </div>
 
-          {/* Forgot Password */}
-          <div className="flex justify-end">
-            <Link
-              to="/forgot-password"
-              className="text-sm text-blue-600 hover:underline"
-            >
-              Forgot password?
-            </Link>
-          </div>
-
           {/* Submit */}
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700 active:scale-[0.98]"
+            size="lg"
+            className="w-full active:scale-[0.98]"
           >
-           {loading ? "Logging in..." : "Login"}
-          </button>
+            {loading ? "Logging in..." : "Login"}
+          </Button>
         </form>
 
-        {/* Register */}
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Don't have an account?{" "}
-          <Link
-            to="/register"
-            className="font-semibold text-blue-600 hover:underline"
-          >
-            Register
-          </Link>
-        </p>
-      </div>
-    </div>
+    </AuthPageShell>
   );
 };
 

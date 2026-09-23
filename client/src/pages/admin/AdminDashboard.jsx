@@ -4,29 +4,33 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 import {
   getUsers,
   createUser,
   updateUser,
   deleteUser,
-} from "../services/userService";
+} from "../../services/userService";
 
 
-import CustomerModal from "../components/crm/CustomerModal";
-import Pagination from "../components/crm/Pagination";
-import DeleteConfirmModal from "../components/crm/DeleteConfirmModal";
-import CustomerTable from "../components/crm/CustomerTable";
+import CustomerModal from "../../components/crm/CustomerModal";
+import Pagination from "../../components/crm/Pagination";
+import DeleteConfirmModal from "../../components/crm/DeleteConfirmModal";
+import CustomerTable from "../../components/crm/CustomerTable";
+import ConfirmAlert from "../../components/ConfirmAlert";
+import AdminDashboardHeader from "../../components/admin/AdminDashboardHeader";
+import DashboardStats from "../../components/admin/DashboardStats";
+import DashboardSkeleton from "../../components/admin/DashboardSkeleton";
 
 
 
 
 
 
-const Dashboard = () => {
+const AdminDashboard = () => {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const [users, setUsers] = useState([]);
 
   const [pagination, setPagination] =
@@ -58,6 +62,12 @@ const Dashboard = () => {
 
   const [selectedUser, setSelectedUser] =
     useState(null);
+
+  const [isLogoutAlertOpen, setIsLogoutAlertOpen] =
+    useState(false);
+
+  const [logoutLoading, setLogoutLoading] =
+    useState(false);
 
   const limit = 10;
 
@@ -209,14 +219,19 @@ const Dashboard = () => {
   };
 
   const handleLogout = async () => {
+    setLogoutLoading(true);
+
     try {
       await logout();
+      toast.success("You have been logged out successfully.");
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
           "Logout failed. You have been signed out locally."
       );
     } finally {
+      setIsLogoutAlertOpen(false);
+      setLogoutLoading(false);
       navigate("/login", { replace: true });
     }
   };
@@ -224,108 +239,32 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
 
-      {/* Header */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <AdminDashboardHeader
+        user={user}
+        onAddCustomer={handleAddCustomer}
+        onLogout={() => setIsLogoutAlertOpen(true)}
+      />
 
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800 sm:text-3xl">
-            CRM Dashboard
-          </h1>
-
-          <p className="mt-1 text-sm text-gray-500">
-            Manage your customers
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <button
-            onClick={handleAddCustomer}
-            className="rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
-          >
-            + Add Customer
-          </button>
-
-          <button
-            onClick={handleLogout}
-            className="rounded-lg bg-red-600 px-5 py-3 font-semibold text-white hover:bg-red-700"
-          >
-            Logout
-          </button>
-        </div>
-   
-
-      </div>
-
-      {/* Statistics */}
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-
-        <div className="rounded-xl bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">
-            Total Customers
-          </p>
-
-          <h2 className="mt-2 text-2xl font-bold">
-            {pagination.totalUsers}
-          </h2>
-        </div>
-
-        <div className="rounded-xl bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">
-            Current Page
-          </p>
-
-          <h2 className="mt-2 text-2xl font-bold">
-            {pagination.currentPage}
-          </h2>
-        </div>
-
-        <div className="rounded-xl bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">
-            Total Pages
-          </p>
-
-          <h2 className="mt-2 text-2xl font-bold">
-            {pagination.totalPages}
-          </h2>
-        </div>
-
-      </div>
-
-      {/* Table */}
       {loading ? (
-        <div className="rounded-xl bg-white p-10 text-center shadow-sm">
-          <p className="text-gray-500">
-            Loading customers...
-          </p>
-        </div>
+        <DashboardSkeleton />
       ) : (
-        <CustomerTable
-          users={users}
-          onEdit={handleEditCustomer}
-          onDelete={handleDeleteClick}
-        />
-      )}
-
-      {/* Pagination */}
-      {!loading &&
-        pagination.totalUsers > 0 && (
-          <Pagination
-            currentPage={
-              pagination.currentPage
-            }
-            totalPages={
-              pagination.totalPages
-            }
-            hasNextPage={
-              pagination.hasNextPage
-            }
-            hasPreviousPage={
-              pagination.hasPreviousPage
-            }
-            onPageChange={
-              handlePageChange
-            }
+        <>
+          <DashboardStats pagination={pagination} />
+          <CustomerTable
+            users={users}
+            onEdit={handleEditCustomer}
+            onDelete={handleDeleteClick}
           />
+          {pagination.totalUsers > 0 && (
+            <Pagination
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              hasNextPage={pagination.hasNextPage}
+              hasPreviousPage={pagination.hasPreviousPage}
+              onPageChange={handlePageChange}
+            />
+          )}
+        </>
         )}
 
       {/* Add / Edit Modal */}
@@ -356,8 +295,19 @@ const Dashboard = () => {
         loading={deleteLoading}
       />
 
+      <ConfirmAlert
+        open={isLogoutAlertOpen}
+        title="Log out?"
+        message="Are you sure you want to log out of your admin account?"
+        confirmLabel="Yes, log out"
+        cancelLabel="Stay signed in"
+        onConfirm={handleLogout}
+        onCancel={() => setIsLogoutAlertOpen(false)}
+        loading={logoutLoading}
+      />
+
     </div>
   );
 };
 
-export default Dashboard;
+export default AdminDashboard;

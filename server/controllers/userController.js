@@ -1,13 +1,9 @@
 const User = require("../models/userModel");
+const mongoose = require("mongoose");
 const { generateToken } = require("../utils/token");
 const { hashedPassword } = require("../utils/password");
 
-// const dashboardController = (req, res, next) => {
-//   try {
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+
 
 const getAllUsers = async (req, res, next) => {
   try {
@@ -90,6 +86,13 @@ const updateUser = async (req, res, next) => {
   try {
     const { id } = req.params;
 
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user id",
+      });
+    }
+
     const { name, email, phone, role } = req.body;
 
     const user = await User.findById(id);
@@ -99,6 +102,38 @@ const updateUser = async (req, res, next) => {
         success: false,
         message: "User not found",
       });
+    }
+
+    if (email && email !== user.email) {
+      const existingUser = await User.findOne({
+        email,
+        _id: { $ne: id },
+      });
+
+      if (existingUser) {
+        return res.status(409).json({
+          success: false,
+          message: "Email already exists",
+        });
+      }
+    }
+
+    if (String(req.user._id) === String(id) && role && role !== user.role) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot change your own role",
+      });
+    }
+
+    if (user.role === "admin" && role === "user") {
+      const adminCount = await User.countDocuments({ role: "admin" });
+
+      if (adminCount <= 1) {
+        return res.status(400).json({
+          success: false,
+          message: "The last admin cannot be demoted",
+        });
+      }
     }
 
     user.name = name ?? user.name;
@@ -129,6 +164,20 @@ const deleteUser = async (req, res, next) => {
   try {
     const { id } = req.params;
 
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user id",
+      });
+    }
+
+    if (String(req.user._id) === String(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot delete your own account",
+      });
+    }
+
     const user = await User.findById(id);
 
     if (!user) {
@@ -136,6 +185,17 @@ const deleteUser = async (req, res, next) => {
         success: false,
         message: "User not found",
       });
+    }
+
+    if (user.role === "admin") {
+      const adminCount = await User.countDocuments({ role: "admin" });
+
+      if (adminCount <= 1) {
+        return res.status(400).json({
+          success: false,
+          message: "The last admin cannot be deleted",
+        });
+      }
     }
 
     await User.findByIdAndDelete(id);
