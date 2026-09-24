@@ -8,23 +8,38 @@ const apiRouter = require("./routes");
 const app = express();
 const allowedOrigins = (process.env.CLIENT_URL || "")
   .split(",")
-  .map((origin) => origin.trim())
+  .map((origin) => origin.trim().replace(/\/$/, ""))
   .filter(Boolean);
 
-if (process.env.NODE_ENV === "production" && allowedOrigins.length === 0) {
-  throw new Error("CLIENT_URL must be configured in production");
-}
+console.log("Allowed CORS Origins:", allowedOrigins);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      // Requests without Origin
+      // Postman, server-to-server, etc.
+      if (!origin) {
         return callback(null, true);
       }
 
-      return callback(new Error("Origin is not allowed"));
+      const normalizedOrigin = origin.replace(/\/$/, "");
+
+      if (allowedOrigins.includes(normalizedOrigin)) {
+        return callback(null, true);
+      }
+
+      console.error("CORS blocked origin:", origin);
+
+      return callback(new Error(`CORS blocked origin: ${origin}`));
     },
+
     credentials: true,
+
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+
+    allowedHeaders: ["Content-Type", "Authorization"],
+
+    optionsSuccessStatus: 204,
   }),
 );
 app.use(helmet());
