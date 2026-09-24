@@ -1,6 +1,6 @@
 const User = require("../models/userModel");
 const mongoose = require("mongoose");
-const { generateToken } = require("../utils/token");
+
 const { hashedPassword } = require("../utils/password");
 
 

@@ -18,7 +18,7 @@ const getRefreshCookieOptions = () => ({
 
   secure: process.env.NODE_ENV === "production",
 
-  sameSite: process.env.REFRESH_COOKIE_SAME_SITE || "lax",
+  sameSite: process.env.REFRESH_COOKIE_SAME_SITE || "none",
 
   maxAge: REFRESH_TOKEN_MAX_AGE,
 
